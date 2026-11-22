@@ -30,7 +30,7 @@ render_header('Patungan', 'groups');
   <span class="badge badge-info"><?= count($groups) ?> grup</span>
 </div>
 
-<div class="grid grid-2" style="margin-bottom: var(--space-5);">
+<div class="grid grid-2">
   <section class="card">
     <div class="card-header">
       <h2><?= icon('plus') ?> Buat grup</h2>

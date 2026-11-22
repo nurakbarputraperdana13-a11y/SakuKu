@@ -240,7 +240,7 @@ render_header('Laporan Keuangan', 'reports');
 </section>
 
 <?php if ($hasPreview): ?>
-<section class="card" style="margin-top: var(--space-5);">
+<section class="card">
   <div class="card-header">
     <h2><?= icon($type === 'personal' ? 'list' : 'users') ?> Pratinjau <?= e($typeLabel) ?></h2>
     <span class="badge"><?= e($periodLabel) ?></span>

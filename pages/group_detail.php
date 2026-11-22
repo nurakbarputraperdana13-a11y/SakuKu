@@ -418,7 +418,7 @@ render_header('Detail Patungan', 'groups');
   </section>
 </div>
 
-<section class="card" style="margin-top: var(--space-5);">
+<section class="card">
   <div class="card-header">
     <h2><?= icon('list') ?> Pengeluaran grup</h2>
     <button class="btn btn-primary" type="button" data-modal-open="add-expense-modal">

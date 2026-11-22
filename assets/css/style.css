@@ -275,6 +275,20 @@ html[data-theme='light'] .icon-moon { display: none; }
   padding: var(--space-5);
   max-width: 1500px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.page-content > .page-head,
+.page-content > .filter-bar,
+.page-content > .flash-stack,
+.page-content > .alert {
+  margin-bottom: 0;
+}
+
+.page-content > .mt-4 {
+  margin-top: 0;
 }
 
 .page-head {
