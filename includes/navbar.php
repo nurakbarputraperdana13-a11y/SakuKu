@@ -3,11 +3,12 @@ declare(strict_types=1);
 
 /**
  * Shared layout. Call render_header($title, $active, $withCharts) then render_footer().
- * $active values: dashboard, transactions, budgets, savings, groups, reports, profile.
+ * $active values: dashboard, transactions, budgets, savings, groups, reports,
+ * profile, admin_users.
  */
 function nav_items(): array
 {
-    return [
+    $items = [
         ['dashboard',   'Dashboard',   'pages/dashboard.php',   'dashboard'],
         ['transactions','Transaksi',   'pages/transactions.php','list'],
         ['budgets',     'Budget',      'pages/budgets.php',     'target'],
@@ -16,6 +17,12 @@ function nav_items(): array
         ['reports',     'Laporan',     'pages/reports.php',     'chart'],
         ['profile',     'Profil',      'pages/profile.php',     'user'],
     ];
+
+    if (($_SESSION['role'] ?? '') === 'admin') {
+        $items[] = ['admin_users', 'Kelola Pengguna', 'pages/admin_users.php', 'shield'];
+    }
+
+    return $items;
 }
 
 function render_header(string $title, string $active = '', bool $withCharts = false): void
@@ -113,6 +120,7 @@ function render_footer(): void
   <div class="sidebar-backdrop" data-menu-close hidden></div>
   <script src="<?= e(url('assets/js/charts.js')) ?>" defer></script>
   <script src="<?= e(url('assets/js/split-bill.js')) ?>" defer></script>
+  <script src="<?= e(url('assets/js/admin-users.js')) ?>" defer></script>
 </body>
 </html>
     <?php

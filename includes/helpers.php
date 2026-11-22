@@ -44,6 +44,17 @@ function require_post(): void
     }
 }
 
+/** Shared security question list for register, recovery, and admin user forms. */
+function security_questions(): array
+{
+    return [
+        'Apa nama hewan peliharaan pertamamu?',
+        'Di kota mana ibumu lahir?',
+        'Apa nama sekolah dasarmu?',
+        'Apa makanan favoritmu semasa kecil?',
+    ];
+}
+
 function format_rupiah(int|float|string|null $amount): string
 {
     return 'Rp' . number_format((int) $amount, 0, ',', '.');

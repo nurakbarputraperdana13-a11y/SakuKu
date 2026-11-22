@@ -27,6 +27,8 @@ CREATE TABLE users (
   name VARCHAR(100) NOT NULL,
   email VARCHAR(100) NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
+  role ENUM('admin', 'user') NOT NULL DEFAULT 'user',
+  status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
   security_question VARCHAR(255) NOT NULL,
   security_answer_hash VARCHAR(255) NOT NULL,
   session_version INT UNSIGNED NOT NULL DEFAULT 1,
@@ -163,3 +165,16 @@ INSERT INTO categories (user_id, name, type, icon) VALUES
   (NULL, 'Beasiswa',           'income',  'award'),
   (NULL, 'Gaji / Freelance',   'income',  'briefcase'),
   (NULL, 'Pemasukan Lainnya',  'income',  'dots');
+
+-- Initial system administrator. Password: admin123. Security answer: SakuKu.
+-- Change both credentials immediately after first login on any deployed instance.
+INSERT INTO users (name, email, password_hash, role, status, security_question, security_answer_hash)
+VALUES (
+  'Administrator SakuKu',
+  'admin@sakuku.id',
+  '$2y$12$fe2W4QQQqUrBKIcB2KYNp.FccvvWCWi1.kNKuRUNnbTBoj0sFfoDu',
+  'admin',
+  'active',
+  'Apa nama aplikasi ini?',
+  '$2y$12$Y9bJop5AcoPgn4srkWWbAe31cGF3jJXUYJltSe2YyojaEVI3HfsRi'
+);

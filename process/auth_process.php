@@ -31,12 +31,7 @@ if ($action === 'logout') {
 require_post();
 verify_csrf();
 
-$questions = [
-    'Apa nama hewan peliharaan pertamamu?',
-    'Di kota mana ibumu lahir?',
-    'Apa nama sekolah dasarmu?',
-    'Apa makanan favoritmu semasa kecil?',
-];
+$questions = security_questions();
 
 /** Changing this version invalidates every older session for the account. */
 function sk_bump_session_version(PDO $pdo, int $userId): int
@@ -97,8 +92,8 @@ if ($action === 'register') {
 
     try {
         $stmt = $pdo->prepare(
-            'INSERT INTO users (name, email, password_hash, security_question, security_answer_hash)
-             VALUES (:name, :email, :password_hash, :security_question, :security_answer_hash)'
+            'INSERT INTO users (name, email, password_hash, role, status, security_question, security_answer_hash)
+             VALUES (:name, :email, :password_hash, \'user\', \'active\', :security_question, :security_answer_hash)'
         );
         $stmt->execute([
             ':name'                 => $name,
@@ -122,7 +117,7 @@ if ($action === 'login') {
     $password = (string) ($_POST['password'] ?? '');
 
     $stmt = $pdo->prepare(
-        'SELECT id, name, email, password_hash, session_version FROM users WHERE email = :email LIMIT 1'
+        'SELECT id, name, email, password_hash, role, status, session_version FROM users WHERE email = :email LIMIT 1'
     );
     $stmt->execute([':email' => $email]);
     $user = $stmt->fetch();
@@ -132,11 +127,18 @@ if ($action === 'login') {
         redirect('pages/login.php');
     }
 
+    if (($user['status'] ?? 'active') !== 'active') {
+        set_flash('error', 'Akun Anda sedang dinonaktifkan oleh Administrator.');
+        redirect('pages/login.php');
+    }
+
+    $role = (string) $user['role'];
     session_regenerate_id(true);
     $_SESSION['user_id'] = (int) $user['id'];
     $_SESSION['session_version'] = (int) $user['session_version'];
+    $_SESSION['role'] = $role;
     set_flash('success', 'Selamat datang, ' . $user['name'] . '.');
-    redirect('pages/dashboard.php');
+    redirect($role === 'admin' ? 'pages/admin_users.php' : 'pages/dashboard.php');
 }
 
 if ($action === 'profile_info' || $action === 'profile_password') {
