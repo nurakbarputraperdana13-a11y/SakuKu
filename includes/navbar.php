@@ -43,7 +43,7 @@ function render_header(string $title, string $active = '', bool $withCharts = fa
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="<?= e(url('assets/js/tailwind.config.js')) ?>"></script>
-  <link rel="stylesheet" href="<?= e(url('assets/css/style.css')) ?>">
+  <link rel="stylesheet" href="<?= e(url('assets/css/style.css')) ?>?v=2">
   <?php if ($withCharts): ?>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
   <?php endif; ?>

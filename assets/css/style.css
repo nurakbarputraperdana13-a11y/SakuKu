@@ -41,6 +41,11 @@ img { max-width: 100%; }
   font-size: 20px;
 }
 
+.icon { width: 20px; height: 20px; flex: 0 0 auto; }
+.flash > .icon { color: var(--color-primary); }
+.flash-error > .icon, .flash-warning > .icon { color: #dc2626; }
+.flash-close .icon { width: 18px; height: 18px; }
+
 .tabular-nums, .num, [data-tnum] { font-variant-numeric: tabular-nums; }
 
 :focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }

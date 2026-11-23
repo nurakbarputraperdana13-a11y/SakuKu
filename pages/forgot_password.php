@@ -172,7 +172,7 @@ if (is_post()) {
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="<?= e(url('assets/js/tailwind.config.js')) ?>"></script>
-  <link rel="stylesheet" href="<?= e(url('assets/css/style.css')) ?>">
+  <link rel="stylesheet" href="<?= e(url('assets/css/style.css')) ?>?v=2">
   <script src="<?= e(url('assets/js/main.js')) ?>" defer></script>
 </head>
 <body class="min-h-screen bg-surface font-body-md text-on-surface antialiased">
