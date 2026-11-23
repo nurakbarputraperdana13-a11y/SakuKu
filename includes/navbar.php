@@ -4,7 +4,7 @@ declare(strict_types=1);
 /**
  * Shared layout. Call render_header($title, $active, $withCharts) then render_footer().
  * $active values: dashboard, transactions, budgets, savings, groups, reports,
- * profile, admin_users.
+ * profile, admin_users. Profil is rendered as a standalone button beside logout.
  */
 function nav_items(): array
 {
@@ -15,7 +15,6 @@ function nav_items(): array
         ['savings',     'Tabungan',    'pages/savings.php',     'savings'],
         ['groups',      'Split Bill',  'pages/groups.php',      'group'],
         ['reports',     'Laporan',     'pages/reports.php',     'monitoring'],
-        ['profile',     'Profil',      'pages/profile.php',     'person'],
     ];
 
     if (($_SESSION['role'] ?? '') === 'admin') {
@@ -76,6 +75,10 @@ function render_header(string $title, string $active = '', bool $withCharts = fa
       </nav>
 
       <div class="flex shrink-0 items-center gap-space-sm">
+        <a class="inline-flex h-10 items-center gap-space-xs rounded-full bg-primary-container px-space-md font-label-lg text-label-lg text-on-primary shadow-sm transition-colors hover:bg-primary" href="<?= e(url('pages/profile.php')) ?>" <?= $active === 'profile' ? 'aria-current="page"' : '' ?>>
+          <span class="material-symbols-outlined text-[18px]" aria-hidden="true">person</span>
+          <span class="hidden sm:inline">Profil</span>
+        </a>
         <form class="logout-form" method="post" action="<?= e(url('process/auth_process.php')) ?>">
           <input type="hidden" name="action" value="logout">
           <?= csrf_field() ?>
