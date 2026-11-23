@@ -1,35 +1,6 @@
 (() => {
   'use strict';
 
-  const root = document.documentElement;
-  const savedTheme = localStorage.getItem('sakuku-theme');
-  if (savedTheme === 'light' || savedTheme === 'dark') {
-    root.dataset.theme = savedTheme;
-  }
-
-  document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
-    button.addEventListener('click', () => {
-      const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
-      root.dataset.theme = next;
-      localStorage.setItem('sakuku-theme', next);
-      window.dispatchEvent(new CustomEvent('sakuku:themechange', { detail: { theme: next } }));
-    });
-  });
-
-  const sidebar = document.getElementById('sidebar');
-  const backdrop = document.querySelector('[data-menu-close]');
-  const menuButton = document.querySelector('[data-menu-toggle]');
-
-  const setMenu = (open) => {
-    if (!sidebar) return;
-    sidebar.classList.toggle('is-open', open);
-    if (backdrop) backdrop.hidden = !open;
-    if (menuButton) menuButton.setAttribute('aria-expanded', String(open));
-  };
-
-  menuButton?.addEventListener('click', () => setMenu(!sidebar?.classList.contains('is-open')));
-  backdrop?.addEventListener('click', () => setMenu(false));
-
   const focusableSelector = 'a[href], button:not([disabled]), input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
   const initialFocusSelector = 'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])';
   let lastModalTrigger = null;
@@ -39,6 +10,7 @@
     lastModalTrigger = trigger || lastModalTrigger;
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
     (modal.querySelector('[autofocus]') || modal.querySelector(initialFocusSelector) || modal.querySelector(focusableSelector))?.focus();
   };
 
@@ -46,6 +18,7 @@
     if (!modal) return;
     modal.classList.remove('is-open');
     modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
     if (lastModalTrigger && document.contains(lastModalTrigger)) lastModalTrigger.focus();
     lastModalTrigger = null;
   };
@@ -58,15 +31,14 @@
     button.addEventListener('click', () => closeModal(button.closest('.modal')));
   });
 
-  document.querySelectorAll('.modal-backdrop').forEach((backdropEl) => {
-    backdropEl.addEventListener('click', () => closeModal(backdropEl.closest('.modal')));
+  document.querySelectorAll('.modal-backdrop').forEach((backdrop) => {
+    backdrop.addEventListener('click', () => closeModal(backdrop.closest('.modal')));
   });
 
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
       const openModalEl = document.querySelector('.modal.is-open');
       if (openModalEl) closeModal(openModalEl);
-      else setMenu(false);
       return;
     }
 

@@ -160,7 +160,7 @@ if (is_post()) {
 }
 ?>
 <!doctype html>
-<html lang="id" data-theme="dark">
+<html lang="id">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -168,22 +168,27 @@ if (is_post()) {
   <title>Lupa Kata Sandi - SakuKu</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="<?= e(url('assets/js/tailwind.config.js')) ?>"></script>
   <link rel="stylesheet" href="<?= e(url('assets/css/style.css')) ?>">
   <script src="<?= e(url('assets/js/main.js')) ?>" defer></script>
 </head>
-<body>
-  <div class="auth-shell">
-    <main class="auth-card">
-      <div class="auth-brand">
-        <span class="brand-mark" aria-hidden="true"><?= icon('wallet') ?></span>
-        <span class="brand-text">Saku<span>Ku</span></span>
+<body class="min-h-screen bg-surface font-body-md text-on-surface antialiased">
+  <main class="mx-auto flex min-h-screen w-full max-w-[1440px] items-center px-margin py-space-xl md:px-margin-desktop">
+    <div class="mx-auto w-full max-w-2xl rounded-3xl border border-surface-container bg-surface-container-lowest p-space-lg shadow-[0_24px_64px_-24px_rgba(17,24,39,0.25)] md:p-space-xl">
+      <div class="flex items-center gap-space-sm">
+        <span class="grid h-11 w-11 place-items-center rounded-full bg-primary-container font-bold text-on-primary">S</span>
+        <span class="font-headline-md text-headline-md">SakuKu</span>
       </div>
-      <h1><?= $resetQuestion === '' ? 'Lupa kata sandi' : 'Pulihkan kata sandi' ?></h1>
-      <p><?= $resetQuestion === '' ? 'Masukkan email akunmu untuk melihat pertanyaan keamanan.' : 'Jawab pertanyaan keamananmu, lalu buat kata sandi baru.' ?></p>
+
+      <p class="mt-space-lg font-label-lg text-label-lg uppercase tracking-wider text-primary">Pemulihan Akun</p>
+      <h1 class="mt-2 font-headline-xl text-headline-xl"><?= $resetQuestion === '' ? 'Lupa kata sandi' : 'Pulihkan kata sandi' ?></h1>
+      <p class="mt-1 font-body-md text-body-md text-on-surface-variant"><?= $resetQuestion === '' ? 'Masukkan email akunmu untuk melihat pertanyaan keamanan.' : 'Jawab pertanyaan keamananmu, lalu buat kata sandi baru.' ?></p>
 
       <?php if ($messages): ?>
-        <div class="flash-stack" aria-live="polite">
+        <div class="flash-stack mt-space-lg" aria-live="polite">
           <?php foreach ($messages as $message): ?>
             <div class="flash flash-<?= e($message['type']) ?>">
               <?= icon($message['type'] === 'success' ? 'check' : (in_array($message['type'], ['error', 'warning'], true) ? 'alert' : 'info')) ?>
@@ -195,53 +200,51 @@ if (is_post()) {
       <?php endif; ?>
 
       <?php if ($resetQuestion === ''): ?>
-        <form action="<?= e(url('pages/forgot_password.php')) ?>" method="post" novalidate>
+        <form class="mt-space-lg flex flex-col gap-space-md" action="<?= e(url('pages/forgot_password.php')) ?>" method="post" novalidate>
           <input type="hidden" name="step" value="1">
           <?= csrf_field() ?>
-          <div class="form-grid">
-            <div class="field">
-              <label for="email">Email</label>
-              <input id="email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="nama@email.com" required>
-              <span class="field-hint">Hanya pertanyaan keamanan yang akan ditampilkan.</span>
-            </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="nama@email.com" required>
+            <span class="field-hint">Hanya pertanyaan keamanan yang akan ditampilkan.</span>
           </div>
-          <div class="form-actions">
-            <button class="btn btn-primary" type="submit"><?= icon('arrow-up') ?> Lanjut</button>
-          </div>
+          <button class="mt-2 inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-primary-container px-5 font-label-lg text-label-lg text-on-primary shadow-md transition-colors hover:bg-primary" type="submit">
+            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_forward</span>
+            Lanjut
+          </button>
         </form>
       <?php else: ?>
-        <div class="alert alert-info" role="status">
-          <?= icon('shield') ?>
-          <span><strong><?= e($resetQuestion) ?></strong><br>Akun: <?= e($resetEmail) ?></span>
+        <div class="mt-space-lg flex items-start gap-space-sm rounded-2xl border border-primary/15 bg-surface-container-low p-space-md" role="status">
+          <span class="material-symbols-outlined text-[20px] text-primary" aria-hidden="true">shield</span>
+          <span class="font-body-md text-body-md"><strong><?= e($resetQuestion) ?></strong><br>Akun: <?= e($resetEmail) ?></span>
         </div>
-        <form action="<?= e(url('pages/forgot_password.php')) ?>" method="post" novalidate>
+        <form class="mt-space-lg flex flex-col gap-space-md" action="<?= e(url('pages/forgot_password.php')) ?>" method="post" novalidate>
           <input type="hidden" name="step" value="2">
           <?= csrf_field() ?>
-          <div class="form-grid">
-            <div class="field">
-              <label for="security_answer">Jawaban keamanan</label>
-              <input id="security_answer" name="security_answer" type="text" autocomplete="off" maxlength="255" placeholder="Jawabanmu" required>
-            </div>
-            <div class="field">
-              <label for="password">Kata sandi baru</label>
-              <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" placeholder="Minimal 8 karakter" required>
-            </div>
-            <div class="field">
-              <label for="password_confirmation">Konfirmasi kata sandi baru</label>
-              <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" minlength="8" placeholder="Ulangi kata sandi baru" required>
-            </div>
+          <div class="field">
+            <label for="security_answer">Jawaban keamanan</label>
+            <input id="security_answer" name="security_answer" type="text" autocomplete="off" maxlength="255" placeholder="Jawabanmu" required>
           </div>
-          <div class="form-actions">
-            <button class="btn btn-primary" type="submit"><?= icon('key') ?> Simpan kata sandi</button>
+          <div class="field">
+            <label for="password">Kata sandi baru</label>
+            <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" placeholder="Minimal 8 karakter" required>
           </div>
+          <div class="field">
+            <label for="password_confirmation">Konfirmasi kata sandi baru</label>
+            <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" minlength="8" placeholder="Ulangi kata sandi baru" required>
+          </div>
+          <button class="mt-2 inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-primary-container px-5 font-label-lg text-label-lg text-on-primary shadow-md transition-colors hover:bg-primary" type="submit">
+            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">key</span>
+            Simpan kata sandi
+          </button>
         </form>
       <?php endif; ?>
 
-      <div class="auth-links">
-        <a href="<?= e(url('pages/login.php')) ?>">Kembali ke masuk</a>
-        <a href="<?= e(url('pages/register.php')) ?>">Daftar akun</a>
+      <div class="mt-space-lg flex flex-wrap items-center justify-between gap-space-sm border-t border-surface-container pt-space-md font-label-md text-label-md">
+        <a class="font-semibold text-primary hover:underline" href="<?= e(url('pages/login.php')) ?>">Kembali ke masuk</a>
+        <a class="font-semibold text-primary hover:underline" href="<?= e(url('pages/register.php')) ?>">Daftar akun</a>
       </div>
-    </main>
-  </div>
+    </div>
+  </main>
 </body>
 </html>

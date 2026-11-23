@@ -121,7 +121,7 @@ if ($hasPreview && !$rangeInvalid) {
             "SELECT ge.expense_date, g.name AS group_name, ge.title,
                     u.name AS paid_by, ge.total_amount
              FROM group_expenses ge
-             JOIN groups g ON g.id = ge.group_id
+             JOIN `groups` g ON g.id = ge.group_id
              JOIN group_members gm ON gm.group_id = ge.group_id AND gm.user_id = :user_id
              JOIN users u ON u.id = ge.paid_by_user_id
              WHERE ge.expense_date BETWEEN :start AND :end
@@ -143,7 +143,7 @@ if ($hasPreview && !$rangeInvalid) {
 
         $stmt = $pdo->prepare(
             "SELECT g.id, g.name, COALESCE(SUM(ge.total_amount), 0) AS total
-             FROM groups g
+             FROM `groups` g
              JOIN group_members gm ON gm.group_id = g.id AND gm.user_id = :user_id
              LEFT JOIN group_expenses ge
                     ON ge.group_id = g.id AND ge.expense_date BETWEEN :start AND :end
@@ -169,233 +169,251 @@ $typeLabel = $type === 'personal' ? 'Transaksi Pribadi' : 'Patungan Grup';
 
 render_header('Laporan Keuangan', 'reports');
 ?>
-<div class="page-head">
+<section class="flex flex-col gap-space-md md:flex-row md:items-end md:justify-between">
   <div>
-    <h1>Laporan Keuangan</h1>
-    <p>Rekap transaksi pribadi dan patungan grup, siap diunduh.</p>
+    <p class="font-label-lg text-label-lg uppercase tracking-wider text-primary">Wealth Operations / Ekspor</p>
+    <h1 class="mt-1 font-headline-xl text-headline-xl text-on-surface md:font-display-lg md:text-display-lg">Laporan keuangan</h1>
+    <p class="mt-1 font-body-md text-body-md text-on-surface-variant">Rekap transaksi pribadi dan patungan grup, siap diunduh.</p>
   </div>
-  <div class="page-actions">
+  <div class="flex flex-wrap items-center gap-space-sm">
     <?php if ($exportDisabled): ?>
-      <span class="btn btn-primary" aria-disabled="true" title="Perbaiki rentang tanggal terlebih dahulu"><?= icon('download') ?> Unduh CSV</span>
-      <span class="btn" aria-disabled="true" title="Perbaiki rentang tanggal terlebih dahulu"><?= icon('download') ?> Unduh PDF</span>
+      <span class="inline-flex h-12 cursor-not-allowed items-center gap-2 rounded-xl border border-on-surface/10 bg-white px-5 font-label-lg text-label-lg text-on-surface-variant opacity-50" title="Perbaiki rentang tanggal terlebih dahulu" aria-disabled="true">
+        <span class="material-symbols-outlined text-[18px]" aria-hidden="true">download</span> Unduh CSV
+      </span>
+      <span class="inline-flex h-12 cursor-not-allowed items-center gap-2 rounded-xl border border-on-surface/10 bg-white px-5 font-label-lg text-label-lg text-on-surface-variant opacity-50" title="Perbaiki rentang tanggal terlebih dahulu" aria-disabled="true">
+        <span class="material-symbols-outlined text-[18px]" aria-hidden="true">picture_as_pdf</span> Unduh PDF
+      </span>
     <?php else: ?>
-      <a class="btn btn-primary" href="<?= e($csvUrl) ?>"><?= icon('download') ?> Unduh CSV</a>
-      <a class="btn" href="<?= e($pdfUrl) ?>"><?= icon('download') ?> Unduh PDF</a>
+      <a class="inline-flex h-12 items-center gap-2 rounded-xl bg-primary-container px-5 font-label-lg text-label-lg text-on-primary shadow-md transition-colors hover:bg-primary" href="<?= e($csvUrl) ?>">
+        <span class="material-symbols-outlined text-[18px]" aria-hidden="true">download</span> Unduh CSV
+      </a>
+      <a class="inline-flex h-12 items-center gap-2 rounded-xl border border-on-surface/10 bg-white px-5 font-label-lg text-label-lg text-on-surface shadow-sm transition-colors hover:bg-surface-container-low" href="<?= e($pdfUrl) ?>">
+        <span class="material-symbols-outlined text-[18px]" aria-hidden="true">picture_as_pdf</span> Unduh PDF
+      </a>
     <?php endif; ?>
-  </div>
-</div>
-
-<section class="card">
-  <div class="card-header">
-    <h2><?= icon('calendar') ?> Pilih Laporan</h2>
-    <span class="badge badge-info">CSV &amp; PDF</span>
-  </div>
-  <div class="card-body">
-    <form class="form-grid" method="get" action="<?= e(url('pages/reports.php')) ?>">
-      <div class="field">
-        <label for="report-type">Jenis laporan</label>
-        <select id="report-type" name="type">
-          <option value="personal" <?= $type === 'personal' ? 'selected' : '' ?>>Transaksi Pribadi</option>
-          <option value="group" <?= $type === 'group' ? 'selected' : '' ?>>Patungan Grup</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <span class="field-label">Mode periode</span>
-        <div class="segmented" id="report-period-month">
-          <label>
-            <input type="radio" name="period" value="month" <?= $period === 'month' ? 'checked' : '' ?>>
-            <span><?= icon('calendar') ?> Bulan</span>
-          </label>
-          <label>
-            <input type="radio" name="period" value="range" <?= $period === 'range' ? 'checked' : '' ?>>
-            <span><?= icon('chart') ?> Rentang</span>
-          </label>
-        </div>
-      </div>
-
-      <div class="field">
-        <label for="report-month">Bulan</label>
-        <input type="month" id="report-month" name="month" value="<?= e($month) ?>">
-        <span class="field-hint">Dipakai saat mode Bulan.</span>
-      </div>
-
-      <div class="field">
-        <label for="report-start">Tanggal mulai</label>
-        <input type="date" id="report-start" name="start" value="<?= e($start) ?>">
-      </div>
-
-      <div class="field">
-        <label for="report-end">Tanggal selesai</label>
-        <input type="date" id="report-end" name="end" value="<?= e($end) ?>">
-        <span class="field-hint">Dipakai saat mode Rentang.</span>
-      </div>
-
-      <div class="field full form-actions">
-        <button class="btn btn-primary" type="submit" name="preview" value="1"><?= icon('search') ?> Tampilkan Pratinjau</button>
-        <span class="field-hint">Unduhan memakai pilihan yang sama dengan pratinjau.</span>
-      </div>
-    </form>
   </div>
 </section>
 
-<?php if ($hasPreview): ?>
-<section class="card">
-  <div class="card-header">
-    <h2><?= icon($type === 'personal' ? 'list' : 'users') ?> Pratinjau <?= e($typeLabel) ?></h2>
-    <span class="badge"><?= e($periodLabel) ?></span>
+<section class="bento-card mt-space-lg">
+  <div class="flex flex-wrap items-center justify-between gap-space-sm">
+    <div>
+      <h2 class="font-headline-lg text-headline-lg text-on-surface">Pilih laporan</h2>
+      <p class="mt-1 font-body-md text-body-md text-on-surface-variant">Pratinjau dan unduhan memakai pengaturan yang sama.</p>
+    </div>
+    <span class="pill pill-lime">CSV &amp; PDF</span>
   </div>
-  <div class="card-body">
-    <?php if ($rangeInvalid): ?>
-      <div class="alert alert-warning">
-        <?= icon('alert') ?>
-        <span>Tanggal mulai harus sebelum atau sama dengan tanggal selesai. Perbaiki rentang untuk melihat data dan mengunduh laporan.</span>
-      </div>
-    <?php elseif ($type === 'personal'): ?>
-      <div class="grid grid-stats" style="margin-bottom: var(--space-5);">
-        <div class="stat-card stat-income">
-          <p class="stat-label">Pemasukan periode</p>
-          <p class="stat-value"><?= e(format_rupiah($personalIncome)) ?></p>
-          <span class="stat-icon"><?= icon('arrow-up') ?></span>
-        </div>
-        <div class="stat-card stat-expense">
-          <p class="stat-label">Pengeluaran periode</p>
-          <p class="stat-value"><?= e(format_rupiah($personalExpense)) ?></p>
-          <span class="stat-icon"><?= icon('arrow-down') ?></span>
-        </div>
-        <div class="stat-card">
-          <p class="stat-label">Saldo periode</p>
-          <p class="stat-value"><?= e(format_rupiah($personalSaldo)) ?></p>
-          <span class="stat-icon"><?= icon('wallet') ?></span>
-        </div>
-      </div>
 
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Tanggal</th>
-              <th>Jenis</th>
-              <th>Kategori</th>
-              <th class="num">Nominal</th>
-              <th>Catatan</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php if (!$personalRows): ?>
-              <tr><td colspan="5">
-                <div class="empty-state">
-                  <?= icon('info') ?>
-                  <strong>Belum ada transaksi</strong>
-                  <span>Tidak ada data pada periode ini.</span>
-                </div>
-              </td></tr>
-            <?php else: ?>
+  <form class="mt-space-lg grid grid-cols-1 gap-space-md sm:grid-cols-2 lg:grid-cols-5" method="get" action="<?= e(url('pages/reports.php')) ?>">
+    <div class="field lg:col-span-1">
+      <label for="report-type">Jenis laporan</label>
+      <select id="report-type" name="type">
+        <option value="personal" <?= $type === 'personal' ? 'selected' : '' ?>>Transaksi Pribadi</option>
+        <option value="group" <?= $type === 'group' ? 'selected' : '' ?>>Patungan Grup</option>
+      </select>
+    </div>
+    <div class="field lg:col-span-2">
+      <span>Mode periode</span>
+      <div class="flex gap-1 rounded-xl bg-surface-container-low p-1">
+        <label class="flex-1">
+          <input class="peer sr-only" type="radio" name="period" value="month" <?= $period === 'month' ? 'checked' : '' ?>>
+          <span class="block cursor-pointer rounded-lg px-3 py-2 text-center font-label-md text-label-md text-on-surface-variant peer-checked:bg-secondary-fixed peer-checked:font-bold peer-checked:text-on-secondary-fixed">Bulan</span>
+        </label>
+        <label class="flex-1">
+          <input class="peer sr-only" type="radio" name="period" value="range" <?= $period === 'range' ? 'checked' : '' ?>>
+          <span class="block cursor-pointer rounded-lg px-3 py-2 text-center font-label-md text-label-md text-on-surface-variant peer-checked:bg-secondary-fixed peer-checked:font-bold peer-checked:text-on-secondary-fixed">Rentang</span>
+        </label>
+      </div>
+    </div>
+    <div class="field lg:col-span-2">
+      <label for="report-month">Bulan</label>
+      <input id="report-month" name="month" type="month" value="<?= e($month) ?>">
+      <span class="field-hint">Dipakai saat mode Bulan.</span>
+    </div>
+    <div class="field lg:col-span-2">
+      <label for="report-start">Tanggal mulai</label>
+      <input id="report-start" name="start" type="date" value="<?= e($start) ?>">
+    </div>
+    <div class="field lg:col-span-2">
+      <label for="report-end">Tanggal selesai</label>
+      <input id="report-end" name="end" type="date" value="<?= e($end) ?>">
+      <span class="field-hint">Dipakai saat mode Rentang.</span>
+    </div>
+    <div class="flex items-end lg:col-span-1">
+      <button class="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary-container px-5 font-label-lg text-label-lg text-on-primary transition-colors hover:bg-primary" type="submit" name="preview" value="1">
+        <span class="material-symbols-outlined text-[18px]" aria-hidden="true">search</span> Pratinjau
+      </button>
+    </div>
+  </form>
+</section>
+
+<?php if (!$hasPreview): ?>
+  <section class="bento-card mt-space-lg">
+    <div class="flex flex-col items-center justify-center gap-2 rounded-2xl bg-surface-container-low px-4 py-14 text-center">
+      <span class="material-symbols-outlined text-[32px] text-outline-variant" aria-hidden="true">description</span>
+      <p class="font-headline-lg text-headline-lg text-on-surface">Belum ada pratinjau laporan</p>
+      <p class="max-w-md font-body-md text-body-md text-on-surface-variant">Pilih jenis laporan dan periode, lalu tekan Pratinjau untuk melihat data sebelum mengunduh.</p>
+    </div>
+  </section>
+<?php elseif ($rangeInvalid): ?>
+  <div class="mt-space-lg flex items-start gap-space-sm rounded-2xl border border-red-200 bg-red-50 p-space-md">
+    <span class="material-symbols-outlined text-[20px] text-red-600" aria-hidden="true">warning</span>
+    <p class="font-body-md text-body-md text-on-surface">Tanggal mulai harus sebelum atau sama dengan tanggal selesai. Perbaiki rentang untuk melihat data dan mengunduh laporan.</p>
+  </div>
+<?php elseif ($type === 'personal'): ?>
+  <section class="mt-space-lg grid grid-cols-1 gap-gutter sm:grid-cols-3 md:gap-gutter-desktop">
+    <article class="bento-card">
+      <span class="font-label-lg text-label-lg text-on-surface-variant">Pemasukan periode</span>
+      <p class="mt-space-md font-metric-numeral-md text-metric-numeral-md tabular-nums text-on-surface"><?= e(format_rupiah($personalIncome)) ?></p>
+      <span class="pill pill-lime mt-space-md w-fit"><?= e($periodLabel) ?></span>
+    </article>
+    <article class="bento-card">
+      <span class="font-label-lg text-label-lg text-on-surface-variant">Pengeluaran periode</span>
+      <p class="mt-space-md font-metric-numeral-md text-metric-numeral-md tabular-nums text-on-surface"><?= e(format_rupiah($personalExpense)) ?></p>
+      <span class="pill pill-red mt-space-md w-fit"><?= count($personalRows) ?> transaksi</span>
+    </article>
+    <article class="bento-card">
+      <span class="font-label-lg text-label-lg text-on-surface-variant">Saldo periode</span>
+      <p class="mt-space-md font-metric-numeral-md text-metric-numeral-md tabular-nums text-on-surface"><?= e(format_rupiah($personalSaldo)) ?></p>
+      <span class="pill pill-neutral mt-space-md w-fit">masuk dikurangi keluar</span>
+    </article>
+  </section>
+
+  <section class="bento-card mt-space-lg">
+    <div class="flex flex-wrap items-center justify-between gap-space-sm">
+      <div>
+        <h2 class="font-headline-lg text-headline-lg text-on-surface">Pratinjau transaksi pribadi</h2>
+        <p class="mt-1 font-body-md text-body-md text-on-surface-variant"><?= e($periodLabel) ?></p>
+      </div>
+      <span class="pill pill-neutral"><?= count($personalRows) ?> data</span>
+    </div>
+    <div class="mt-space-lg">
+      <?php if (!$personalRows): ?>
+        <div class="flex flex-col items-center justify-center gap-2 rounded-2xl bg-surface-container-low px-4 py-12 text-center">
+          <span class="material-symbols-outlined text-[28px] text-outline-variant" aria-hidden="true">info</span>
+          <p class="font-headline-md text-headline-md text-on-surface">Belum ada transaksi</p>
+          <p class="max-w-sm font-body-md text-body-md text-on-surface-variant">Tidak ada data pada periode ini.</p>
+        </div>
+      <?php else: ?>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left font-body-md text-body-md">
+            <thead>
+              <tr class="border-b border-surface-container text-on-surface-variant">
+                <th class="py-2 font-label-md text-label-md">Tanggal</th>
+                <th class="py-2 font-label-md text-label-md">Jenis</th>
+                <th class="py-2 font-label-md text-label-md">Kategori</th>
+                <th class="py-2 text-right font-label-md text-label-md">Nominal</th>
+                <th class="py-2 font-label-md text-label-md">Catatan</th>
+              </tr>
+            </thead>
+            <tbody>
               <?php foreach ($personalRows as $row): ?>
-                <tr>
-                  <td><?= e($row['date']) ?></td>
-                  <td><span class="badge <?= $row['income'] ? 'badge-success' : 'badge-danger' ?>"><?= e($row['type']) ?></span></td>
-                  <td class="cell-main"><?= e($row['category']) ?></td>
-                  <td class="num"><?= e(format_rupiah($row['amount'])) ?></td>
-                  <td><?= e($row['note'] !== '' ? $row['note'] : '-') ?></td>
+                <tr class="border-b border-surface-container/70 transition-colors hover:bg-surface-container-low">
+                  <td class="py-3 tabular-nums text-on-surface-variant"><?= e($row['date']) ?></td>
+                  <td class="py-3"><span class="pill <?= $row['income'] ? 'pill-lime' : 'pill-red' ?>"><?= e($row['type']) ?></span></td>
+                  <td class="py-3 font-semibold text-on-surface"><?= e($row['category']) ?></td>
+                  <td class="py-3 text-right font-bold tabular-nums text-on-surface"><?= e(format_rupiah($row['amount'])) ?></td>
+                  <td class="py-3 text-on-surface-variant"><?= e($row['note'] !== '' ? $row['note'] : '-') ?></td>
                 </tr>
               <?php endforeach; ?>
-            <?php endif; ?>
-          </tbody>
-        </table>
-      </div>
-    <?php else: ?>
-      <div class="grid grid-2" style="margin-bottom: var(--space-5);">
-        <div class="stat-card">
-          <p class="stat-label">Total pengeluaran grup periode ini</p>
-          <p class="stat-value"><?= e(format_rupiah($groupTotal)) ?></p>
-          <span class="stat-icon"><?= icon('users') ?></span>
+            </tbody>
+          </table>
         </div>
-        <div class="stat-card">
-          <p class="stat-label">Jumlah catatan patungan</p>
-          <p class="stat-value"><?= e(count($groupRows)) ?></p>
-          <span class="stat-icon"><?= icon('list') ?></span>
-        </div>
-      </div>
+      <?php endif; ?>
+    </div>
+  </section>
+<?php else: ?>
+  <section class="mt-space-lg grid grid-cols-1 gap-gutter sm:grid-cols-2 md:gap-gutter-desktop">
+    <article class="bento-card">
+      <span class="font-label-lg text-label-lg text-on-surface-variant">Total pengeluaran grup</span>
+      <p class="mt-space-md font-metric-numeral-md text-metric-numeral-md tabular-nums text-on-surface"><?= e(format_rupiah($groupTotal)) ?></p>
+      <span class="pill pill-neutral mt-space-md w-fit"><?= e($periodLabel) ?></span>
+    </article>
+    <article class="bento-card">
+      <span class="font-label-lg text-label-lg text-on-surface-variant">Jumlah catatan patungan</span>
+      <p class="mt-space-md font-metric-numeral-md text-metric-numeral-md tabular-nums text-on-surface"><?= e(count($groupRows)) ?></p>
+      <span class="pill pill-lime mt-space-md w-fit">pengeluaran grup</span>
+    </article>
+  </section>
 
-      <h3 style="margin: 0 0 var(--space-3);">Ringkasan per grup</h3>
-      <div class="table-wrap" style="margin-bottom: var(--space-5);">
-        <table>
-          <thead>
-            <tr>
-              <th>Grup</th>
-              <th class="num">Pengeluaran periode</th>
-              <th class="num">Saldo bersih kamu (saat ini)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php if (!$groupSummaries): ?>
-              <tr><td colspan="3">
-                <div class="empty-state">
-                  <?= icon('info') ?>
-                  <strong>Belum ada grup</strong>
-                  <span>Kamu belum menjadi anggota grup mana pun.</span>
-                </div>
-              </td></tr>
-            <?php else: ?>
+  <section class="bento-card mt-space-lg">
+    <h2 class="font-headline-lg text-headline-lg text-on-surface">Ringkasan per grup</h2>
+    <div class="mt-space-lg">
+      <?php if (!$groupSummaries): ?>
+        <div class="flex flex-col items-center justify-center gap-2 rounded-2xl bg-surface-container-low px-4 py-10 text-center">
+          <span class="material-symbols-outlined text-[28px] text-outline-variant" aria-hidden="true">group</span>
+          <p class="font-headline-md text-headline-md text-on-surface">Belum ada grup</p>
+          <p class="max-w-sm font-body-md text-body-md text-on-surface-variant">Kamu belum menjadi anggota grup mana pun.</p>
+        </div>
+      <?php else: ?>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left font-body-md text-body-md">
+            <thead>
+              <tr class="border-b border-surface-container text-on-surface-variant">
+                <th class="py-2 font-label-md text-label-md">Grup</th>
+                <th class="py-2 text-right font-label-md text-label-md">Pengeluaran periode</th>
+                <th class="py-2 text-right font-label-md text-label-md">Saldo bersih kamu (saat ini)</th>
+              </tr>
+            </thead>
+            <tbody>
               <?php foreach ($groupSummaries as $summary): ?>
-                <tr>
-                  <td class="cell-main"><?= e($summary['name']) ?></td>
-                  <td class="num"><?= e(format_rupiah($summary['total'])) ?></td>
-                  <td class="num">
+                <tr class="border-b border-surface-container/70 transition-colors hover:bg-surface-container-low">
+                  <td class="py-3 font-semibold text-on-surface"><?= e($summary['name']) ?></td>
+                  <td class="py-3 text-right tabular-nums text-on-surface"><?= e(format_rupiah($summary['total'])) ?></td>
+                  <td class="py-3 text-right">
                     <?php if ($summary['net'] > 0): ?>
-                      <span class="badge badge-success">Piutang <?= e(format_rupiah($summary['net'])) ?></span>
+                      <span class="pill pill-lime">Piutang <?= e(format_rupiah($summary['net'])) ?></span>
                     <?php elseif ($summary['net'] < 0): ?>
-                      <span class="badge badge-danger">Utang <?= e(format_rupiah(abs($summary['net']))) ?></span>
+                      <span class="pill pill-red">Utang <?= e(format_rupiah(abs($summary['net']))) ?></span>
                     <?php else: ?>
-                      <span class="badge">Lunas</span>
+                      <span class="pill pill-neutral">Lunas</span>
                     <?php endif; ?>
                   </td>
                 </tr>
               <?php endforeach; ?>
-            <?php endif; ?>
-          </tbody>
-        </table>
-      </div>
+            </tbody>
+          </table>
+        </div>
+      <?php endif; ?>
+    </div>
+  </section>
 
-      <h3 style="margin: 0 0 var(--space-3);">Rincian pengeluaran grup</h3>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Tanggal</th>
-              <th>Grup</th>
-              <th>Judul</th>
-              <th>Dibayar Oleh</th>
-              <th class="num">Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php if (!$groupRows): ?>
-              <tr><td colspan="5">
-                <div class="empty-state">
-                  <?= icon('info') ?>
-                  <strong>Belum ada pengeluaran</strong>
-                  <span>Tidak ada catatan patungan pada periode ini.</span>
-                </div>
-              </td></tr>
-            <?php else: ?>
+  <section class="bento-card mt-space-lg">
+    <h2 class="font-headline-lg text-headline-lg text-on-surface">Rincian pengeluaran grup</h2>
+    <div class="mt-space-lg">
+      <?php if (!$groupRows): ?>
+        <div class="flex flex-col items-center justify-center gap-2 rounded-2xl bg-surface-container-low px-4 py-10 text-center">
+          <span class="material-symbols-outlined text-[28px] text-outline-variant" aria-hidden="true">receipt_long</span>
+          <p class="font-headline-md text-headline-md text-on-surface">Belum ada pengeluaran</p>
+          <p class="max-w-sm font-body-md text-body-md text-on-surface-variant">Tidak ada catatan patungan pada periode ini.</p>
+        </div>
+      <?php else: ?>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left font-body-md text-body-md">
+            <thead>
+              <tr class="border-b border-surface-container text-on-surface-variant">
+                <th class="py-2 font-label-md text-label-md">Tanggal</th>
+                <th class="py-2 font-label-md text-label-md">Grup</th>
+                <th class="py-2 font-label-md text-label-md">Judul</th>
+                <th class="py-2 font-label-md text-label-md">Dibayar oleh</th>
+                <th class="py-2 text-right font-label-md text-label-md">Total</th>
+              </tr>
+            </thead>
+            <tbody>
               <?php foreach ($groupRows as $row): ?>
-                <tr>
-                  <td><?= e($row['date']) ?></td>
-                  <td><?= e($row['group']) ?></td>
-                  <td class="cell-main"><?= e($row['title']) ?></td>
-                  <td><?= e($row['paid_by']) ?></td>
-                  <td class="num"><?= e(format_rupiah($row['amount'])) ?></td>
+                <tr class="border-b border-surface-container/70 transition-colors hover:bg-surface-container-low">
+                  <td class="py-3 tabular-nums text-on-surface-variant"><?= e($row['date']) ?></td>
+                  <td class="py-3 text-on-surface-variant"><?= e($row['group']) ?></td>
+                  <td class="py-3 font-semibold text-on-surface"><?= e($row['title']) ?></td>
+                  <td class="py-3 text-on-surface-variant"><?= e($row['paid_by']) ?></td>
+                  <td class="py-3 text-right font-bold tabular-nums text-on-surface"><?= e(format_rupiah($row['amount'])) ?></td>
                 </tr>
               <?php endforeach; ?>
-            <?php endif; ?>
-          </tbody>
-        </table>
-      </div>
-    <?php endif; ?>
-  </div>
-</section>
+            </tbody>
+          </table>
+        </div>
+      <?php endif; ?>
+    </div>
+  </section>
 <?php endif; ?>
 
 <?php

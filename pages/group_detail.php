@@ -40,7 +40,8 @@ function gd_render_split_form(
     $selectedSet = array_fill_keys($selectedIds, true);
     ?>
     <form method="post" action="<?= e(url('process/split_process.php')) ?>" data-split-form
-          data-initial-amounts="<?= e($initialJson) ?>">
+          data-initial-amounts="<?= e($initialJson) ?>"
+          class="flex flex-col gap-space-md">
       <input type="hidden" name="action" value="<?= e($action) ?>">
       <input type="hidden" name="group_id" value="<?= $groupId ?>">
       <?php if ($expenseId !== null): ?>
@@ -48,87 +49,81 @@ function gd_render_split_form(
       <?php endif; ?>
       <?= csrf_field() ?>
 
-      <div class="form-grid cols-1">
-        <div class="field">
-          <label>Judul pengeluaran</label>
-          <input name="title" type="text" maxlength="100" placeholder="Mis. Makan malam kelompok" value="<?= e($title) ?>" required>
-        </div>
+      <div class="field">
+        <label>Judul pengeluaran</label>
+        <input name="title" type="text" maxlength="100" placeholder="Mis. Makan malam kelompok" value="<?= e($title) ?>" required>
+      </div>
 
-        <div class="form-grid">
-          <div class="field">
-            <label>Total (Rp)</label>
-            <input name="total_amount" type="text" inputmode="numeric" data-split-total placeholder="100000" value="<?= e($total) ?>" required>
-          </div>
-          <div class="field">
-            <label>Tanggal</label>
-            <input name="expense_date" type="date" value="<?= e($date) ?>" required>
-          </div>
-        </div>
-
+      <div class="grid grid-cols-1 gap-space-md sm:grid-cols-2">
         <div class="field">
-          <label>Pembayar</label>
-          <?php if ($lockPayer): ?>
-            <input type="hidden" name="paid_by_user_id" value="<?= $payerId ?>">
-            <input type="text" value="<?= e($userNames[$payerId] ?? ('Anggota #' . $payerId)) ?>" disabled>
-            <span class="field-hint">Hanya admin yang bisa mengubah pembayar pengeluaran orang lain.</span>
-          <?php else: ?>
-            <select name="paid_by_user_id" required>
-              <?php foreach ($members as $member): ?>
-                <?php $memberId = (int) $member['id']; ?>
-                <option value="<?= $memberId ?>" <?= $memberId === $payerId ? 'selected' : '' ?>>
-                  <?= e($member['name']) ?>
-                </option>
-              <?php endforeach; ?>
-            </select>
-          <?php endif; ?>
+          <label>Total (Rp)</label>
+          <input name="total_amount" type="text" inputmode="numeric" data-split-total placeholder="100000" value="<?= e($total) ?>" required>
         </div>
-
         <div class="field">
-          <label>Mode pembagian</label>
-          <div class="segmented">
-            <label>
-              <input type="radio" name="mode" value="equal" <?= $mode === 'equal' ? 'checked' : '' ?>>
-              <span><?= icon('users') ?> Bagi rata</span>
-            </label>
-            <label>
-              <input type="radio" name="mode" value="exact" <?= $mode === 'exact' ? 'checked' : '' ?>>
-              <span><?= icon('wallet') ?> Nominal pasti</span>
-            </label>
-          </div>
+          <label>Tanggal</label>
+          <input name="expense_date" type="date" value="<?= e($date) ?>" required>
         </div>
+      </div>
 
-        <div class="field">
-          <label>Peserta</label>
-          <div class="member-list">
+      <div class="field">
+        <label>Pembayar</label>
+        <?php if ($lockPayer): ?>
+          <input type="hidden" name="paid_by_user_id" value="<?= $payerId ?>">
+          <input type="text" value="<?= e($userNames[$payerId] ?? ('Anggota #' . $payerId)) ?>" disabled>
+          <span class="field-hint">Hanya admin yang bisa mengubah pembayar pengeluaran orang lain.</span>
+        <?php else: ?>
+          <select name="paid_by_user_id" required>
             <?php foreach ($members as $member): ?>
               <?php $memberId = (int) $member['id']; ?>
-              <label class="split-row">
-                <span class="split-check">
-                  <input type="checkbox" name="participants[]" value="<?= $memberId ?>"
-                         data-participant data-name="<?= e($member['name']) ?>"
-                         <?= isset($selectedSet[$memberId]) ? 'checked' : '' ?>>
-                </span>
-                <span class="split-person">
-                  <span class="avatar" aria-hidden="true"><?= e(mb_substr((string) $member['name'], 0, 1)) ?></span>
-                  <strong><?= e($member['name']) ?></strong>
-                </span>
-                <span class="field-hint"><?= $memberId === $payerId ? 'Pembayar' : '' ?></span>
-              </label>
+              <option value="<?= $memberId ?>" <?= $memberId === $payerId ? 'selected' : '' ?>>
+                <?= e($member['name']) ?>
+              </option>
             <?php endforeach; ?>
-          </div>
-        </div>
+          </select>
+        <?php endif; ?>
+      </div>
 
-        <div class="field">
-          <label>Preview pembagian</label>
-          <div class="member-list" data-split-preview></div>
-          <div class="alert alert-warning" data-split-warning style="display:none;"></div>
-          <noscript><span class="field-hint">Aktifkan JavaScript untuk melihat preview dan mengisi nominal pasti.</span></noscript>
+      <div class="field">
+        <label>Mode pembagian</label>
+        <div class="flex gap-1 rounded-xl bg-surface-container-low p-1">
+          <label class="flex-1">
+            <input class="peer sr-only" type="radio" name="mode" value="equal" <?= $mode === 'equal' ? 'checked' : '' ?>>
+            <span class="block cursor-pointer rounded-lg px-3 py-2 text-center font-label-md text-label-md text-on-surface-variant peer-checked:bg-secondary-fixed peer-checked:font-bold peer-checked:text-on-secondary-fixed">Bagi rata</span>
+          </label>
+          <label class="flex-1">
+            <input class="peer sr-only" type="radio" name="mode" value="exact" <?= $mode === 'exact' ? 'checked' : '' ?>>
+            <span class="block cursor-pointer rounded-lg px-3 py-2 text-center font-label-md text-label-md text-on-surface-variant peer-checked:bg-secondary-fixed peer-checked:font-bold peer-checked:text-on-secondary-fixed">Nominal pasti</span>
+          </label>
         </div>
       </div>
 
-      <div class="form-actions">
-        <button class="btn btn-primary" type="submit" data-split-submit><?= icon('check') ?> <?= e($submitLabel) ?></button>
+      <div class="field">
+        <label>Peserta</label>
+        <div class="flex flex-col gap-space-xs">
+          <?php foreach ($members as $member): ?>
+            <?php $memberId = (int) $member['id']; ?>
+            <label class="split-row cursor-pointer">
+              <input class="h-4 w-4 accent-primary" type="checkbox" name="participants[]" value="<?= $memberId ?>"
+                     data-participant data-name="<?= e($member['name']) ?>"
+                     <?= isset($selectedSet[$memberId]) ? 'checked' : '' ?>>
+              <span class="split-person">
+                <span class="avatar" aria-hidden="true"><?= e(mb_substr((string) $member['name'], 0, 1)) ?></span>
+                <strong><?= e($member['name']) ?></strong>
+              </span>
+              <span class="field-hint"><?= $memberId === $payerId ? 'Pembayar' : '' ?></span>
+            </label>
+          <?php endforeach; ?>
+        </div>
       </div>
+
+      <div class="field">
+        <label>Preview pembagian</label>
+        <div class="flex flex-col gap-space-xs rounded-2xl bg-surface-container-low p-space-md" data-split-preview></div>
+        <div class="hidden rounded-2xl border border-red-200 bg-red-50 p-space-md font-label-md text-label-md text-red-700" data-split-warning></div>
+        <noscript><span class="field-hint">Aktifkan JavaScript untuk melihat preview dan mengisi nominal pasti.</span></noscript>
+      </div>
+
+      <button class="inline-flex h-11 items-center gap-2 rounded-xl bg-primary-container px-5 font-label-lg text-label-lg text-on-primary transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50" type="submit" data-split-submit><?= e($submitLabel) ?></button>
     </form>
     <?php
 }
@@ -247,264 +242,238 @@ foreach ($stmt->fetchAll() as $row) {
 $today = date('Y-m-d');
 $allMemberIds = array_column($members, 'id');
 
-render_header('Detail Patungan', 'groups');
+render_header('Detail Split Bill', 'groups');
 ?>
-
-<div class="page-head">
+<section class="flex flex-col gap-space-md md:flex-row md:items-end md:justify-between">
   <div>
-    <h1><?= e($group['name']) ?></h1>
-    <p>
-      <?= e($group['description'] !== null && $group['description'] !== '' ? $group['description'] : 'Patungan anggota grup.') ?>
-    </p>
+    <p class="font-label-lg text-label-lg uppercase tracking-wider text-primary">Wealth Operations / Split Bill</p>
+    <h1 class="mt-1 font-headline-xl text-headline-xl text-on-surface md:font-display-lg md:text-display-lg"><?= e($group['name']) ?></h1>
+    <p class="mt-1 font-body-md text-body-md text-on-surface-variant"><?= e($group['description'] !== null && $group['description'] !== '' ? $group['description'] : 'Patungan anggota grup.') ?></p>
   </div>
-  <div class="page-actions">
-    <a class="btn" href="<?= e(url('pages/groups.php')) ?>"><?= icon('arrow-down') ?> Daftar grup</a>
-    <div class="invite-code">
+  <div class="flex flex-wrap items-center gap-space-sm">
+    <a class="inline-flex h-11 items-center rounded-xl border border-on-surface/10 bg-white px-5 font-label-lg text-label-lg text-on-surface hover:bg-surface-container-low" href="<?= e(url('pages/groups.php')) ?>">Daftar grup</a>
+    <div class="inline-flex items-center gap-space-xs rounded-full bg-surface-container-low px-space-md py-space-xs font-label-md text-label-md tabular-nums text-on-surface">
       <span><?= e($group['invite_code']) ?></span>
-      <button class="btn btn-sm btn-icon" type="button" data-copy="<?= e($group['invite_code']) ?>" aria-label="Salin kode undangan">
-        <?= icon('copy') ?>
-      </button>
+      <button class="font-bold text-primary hover:underline" type="button" data-copy="<?= e($group['invite_code']) ?>" aria-label="Salin kode undangan">Salin</button>
     </div>
   </div>
+</section>
+
+<div class="mt-space-lg flex items-start gap-space-sm rounded-2xl border border-lime-300/60 bg-lime-50 p-space-md">
+  <span class="material-symbols-outlined text-[20px] text-green-700" aria-hidden="true">info</span>
+  <p class="font-body-md text-body-md text-on-surface">Anggota hanya bisa keluar atau dikeluarkan saat saldo bersihnya tepat <strong>Rp0</strong>. Selesaikan semua tagihan terlebih dahulu.</p>
 </div>
 
-<div class="alert alert-warning">
-  <?= icon('alert') ?>
-  <span>Anggota hanya bisa keluar atau dikeluarkan saat saldo bersihnya tepat <strong>Rp0</strong>. Selesaikan semua tagihan terlebih dahulu.</span>
-</div>
-
-<div class="grid grid-2">
-  <section class="card">
-    <div class="card-header">
-      <h2><?= icon('users') ?> Anggota grup</h2>
-      <span class="badge"><?= count($members) ?> orang</span>
+<section class="mt-space-lg grid grid-cols-1 gap-gutter md:grid-cols-2 md:gap-gutter-desktop">
+  <div class="bento-card">
+    <div class="flex flex-wrap items-center justify-between gap-space-sm">
+      <div>
+        <h2 class="font-headline-lg text-headline-lg text-on-surface">Anggota grup</h2>
+        <p class="mt-1 font-body-md text-body-md text-on-surface-variant">Posisi saldo bersih tiap anggota.</p>
+      </div>
+      <span class="pill pill-neutral"><?= count($members) ?> orang</span>
     </div>
-    <div class="card-body">
-      <?php if ($isAdmin): ?>
-        <form method="post" action="<?= e(url('process/group_process.php')) ?>" style="margin-bottom: var(--space-4);">
-          <input type="hidden" name="action" value="add_member">
-          <input type="hidden" name="group_id" value="<?= $groupId ?>">
-          <?= csrf_field() ?>
-          <div class="form-grid">
-            <div class="field">
-              <label for="member-email">Tambah anggota via email</label>
-              <input id="member-email" name="email" type="email" placeholder="nama@email.com" required>
-            </div>
-            <div class="field" style="align-self: end;">
-              <button class="btn" type="submit"><?= icon('plus') ?> Tambah</button>
-            </div>
-          </div>
-        </form>
-      <?php endif; ?>
 
-      <div class="member-list">
-        <?php foreach ($members as $member): ?>
-          <?php
+    <?php if ($isAdmin): ?>
+      <form class="mt-space-lg flex flex-wrap items-end gap-space-sm" method="post" action="<?= e(url('process/group_process.php')) ?>">
+        <input type="hidden" name="action" value="add_member">
+        <input type="hidden" name="group_id" value="<?= $groupId ?>">
+        <?= csrf_field() ?>
+        <div class="field min-w-[200px] flex-1"><label for="member-email">Tambah anggota via email</label><input id="member-email" name="email" type="email" placeholder="nama@email.com" required></div>
+        <button class="inline-flex h-11 items-center rounded-xl bg-primary-container px-5 font-label-lg text-label-lg text-on-primary hover:bg-primary" type="submit">Tambah</button>
+      </form>
+    <?php endif; ?>
+
+    <div class="mt-space-lg flex flex-col gap-space-xs">
+      <?php foreach ($members as $member): ?>
+        <?php
           $memberId = $member['id'];
           $balance = (int) ($balances[$memberId] ?? 0);
-          $netClass = $balance > 0 ? 'net-positive' : ($balance < 0 ? 'net-negative' : 'net-zero');
+          $netPill = $balance > 0 ? 'pill-lime' : ($balance < 0 ? 'pill-red' : 'pill-neutral');
           $netLabel = $balance > 0 ? 'Piutang' : ($balance < 0 ? 'Utang' : 'Lunas');
-          ?>
-          <div class="member-row">
-            <span class="avatar" aria-hidden="true"><?= e(mb_substr($member['name'], 0, 1)) ?></span>
-            <div class="member-meta">
-              <span class="member-name"><?= e($member['name']) ?> <?= $memberId === $userId ? '(Kamu)' : '' ?></span>
-              <span class="cell-sub"><?= e($member['email']) ?></span>
-            </div>
-            <span class="badge <?= $member['role'] === 'admin' ? 'badge-info' : '' ?>">
-              <?= $member['role'] === 'admin' ? 'Admin' : 'Anggota' ?>
-            </span>
-            <span class="<?= $netClass ?>">
-              <?= e($netLabel) ?> <?= e(format_rupiah(abs($balance))) ?>
-            </span>
-
-            <?php if ($isAdmin && $memberId !== $userId): ?>
-              <div class="member-actions">
-                <form method="post" action="<?= e(url('process/group_process.php')) ?>">
-                  <input type="hidden" name="action" value="change_role">
-                  <input type="hidden" name="group_id" value="<?= $groupId ?>">
-                  <input type="hidden" name="user_id" value="<?= $memberId ?>">
-                  <?= csrf_field() ?>
-                  <select name="role" aria-label="Role <?= e($member['name']) ?>">
-                    <option value="admin" <?= $member['role'] === 'admin' ? 'selected' : '' ?>>Admin</option>
-                    <option value="member" <?= $member['role'] === 'member' ? 'selected' : '' ?>>Anggota</option>
-                  </select>
-                  <button class="btn btn-sm" type="submit"><?= icon('check') ?></button>
-                </form>
-                <form method="post" action="<?= e(url('process/group_process.php')) ?>" data-confirm="Keluarkan <?= e($member['name']) ?> dari grup?">
-                  <input type="hidden" name="action" value="kick">
-                  <input type="hidden" name="group_id" value="<?= $groupId ?>">
-                  <input type="hidden" name="user_id" value="<?= $memberId ?>">
-                  <?= csrf_field() ?>
-                  <button class="btn btn-sm btn-danger" type="submit"><?= icon('trash') ?></button>
-                </form>
-              </div>
-            <?php endif; ?>
+        ?>
+        <div class="flex flex-wrap items-center gap-space-sm rounded-2xl bg-surface-container-low p-space-md">
+          <span class="avatar" aria-hidden="true"><?= e(mb_substr($member['name'], 0, 1)) ?></span>
+          <div class="min-w-0 flex-1">
+            <span class="block font-label-lg text-label-lg font-semibold text-on-surface"><?= e($member['name']) ?> <?= $memberId === $userId ? '(Kamu)' : '' ?></span>
+            <span class="font-label-sm text-label-sm text-on-surface-variant"><?= e($member['email']) ?></span>
           </div>
-        <?php endforeach; ?>
-      </div>
+          <span class="pill <?= $member['role'] === 'admin' ? 'pill-lime' : 'pill-neutral' ?>"><?= $member['role'] === 'admin' ? 'Admin' : 'Anggota' ?></span>
+          <span class="pill <?= $netPill ?>"><?= e($netLabel) ?> <?= e(format_rupiah(abs($balance))) ?></span>
 
-      <div class="form-actions">
-        <form method="post" action="<?= e(url('process/group_process.php')) ?>" data-confirm="Yakin keluar dari grup ini?">
-          <input type="hidden" name="action" value="leave">
+          <?php if ($isAdmin && $memberId !== $userId): ?>
+            <div class="flex items-center gap-space-xs">
+              <form method="post" action="<?= e(url('process/group_process.php')) ?>" class="flex items-center gap-space-xs">
+                <input type="hidden" name="action" value="change_role">
+                <input type="hidden" name="group_id" value="<?= $groupId ?>">
+                <input type="hidden" name="user_id" value="<?= $memberId ?>">
+                <?= csrf_field() ?>
+                <label class="sr-only" for="role-<?= $memberId ?>">Role <?= e($member['name']) ?></label>
+                <select id="role-<?= $memberId ?>" name="role" class="h-9 rounded-lg border border-on-surface/10 bg-white px-2 font-label-sm text-label-sm">
+                  <option value="admin" <?= $member['role'] === 'admin' ? 'selected' : '' ?>>Admin</option>
+                  <option value="member" <?= $member['role'] === 'member' ? 'selected' : '' ?>>Anggota</option>
+                </select>
+                <button class="grid h-9 w-9 place-items-center rounded-full bg-primary-container text-on-primary" type="submit" aria-label="Simpan role"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">check</span></button>
+              </form>
+              <form method="post" action="<?= e(url('process/group_process.php')) ?>" data-confirm="Keluarkan <?= e($member['name']) ?> dari grup?">
+                <input type="hidden" name="action" value="kick">
+                <input type="hidden" name="group_id" value="<?= $groupId ?>">
+                <input type="hidden" name="user_id" value="<?= $memberId ?>">
+                <?= csrf_field() ?>
+                <button class="grid h-9 w-9 place-items-center rounded-full bg-red-50 text-red-600 hover:bg-red-100" type="submit" aria-label="Keluarkan anggota"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">person_remove</span></button>
+              </form>
+            </div>
+          <?php endif; ?>
+        </div>
+      <?php endforeach; ?>
+    </div>
+
+    <div class="mt-space-lg flex flex-wrap items-center gap-space-sm border-t border-surface-container pt-space-md">
+      <form method="post" action="<?= e(url('process/group_process.php')) ?>" data-confirm="Yakin keluar dari grup ini?">
+        <input type="hidden" name="action" value="leave">
+        <input type="hidden" name="group_id" value="<?= $groupId ?>">
+        <?= csrf_field() ?>
+        <button class="inline-flex h-10 items-center rounded-xl border border-on-surface/10 px-space-md font-label-lg text-label-lg text-on-surface-variant hover:bg-surface-container-low" type="submit">Keluar grup</button>
+      </form>
+      <?php if ($isAdmin): ?>
+        <form method="post" action="<?= e(url('process/group_process.php')) ?>" data-confirm="Hapus grup beserta semua tagihannya? Tindakan ini tidak bisa dibatalkan.">
+          <input type="hidden" name="action" value="delete">
           <input type="hidden" name="group_id" value="<?= $groupId ?>">
           <?= csrf_field() ?>
-          <button class="btn" type="submit"><?= icon('logout') ?> Keluar grup</button>
+          <button class="inline-flex h-10 items-center rounded-xl bg-red-50 px-space-md font-label-lg text-label-lg text-red-600 hover:bg-red-100" type="submit">Hapus grup</button>
         </form>
+      <?php endif; ?>
+    </div>
+  </div>
 
-        <?php if ($isAdmin): ?>
-          <form method="post" action="<?= e(url('process/group_process.php')) ?>" data-confirm="Hapus grup beserta semua tagihannya? Tindakan ini tidak bisa dibatalkan.">
-            <input type="hidden" name="action" value="delete">
-            <input type="hidden" name="group_id" value="<?= $groupId ?>">
-            <?= csrf_field() ?>
-            <button class="btn btn-danger" type="submit"><?= icon('trash') ?> Hapus grup</button>
-          </form>
-        <?php endif; ?>
+  <div class="bento-dark flex flex-col justify-between gap-space-lg">
+    <div class="flex items-start justify-between gap-space-sm">
+      <div>
+        <span class="font-label-md text-label-md uppercase tracking-wider text-[#99f6e4]">Greedy Settlement</span>
+        <h2 class="mt-2 font-headline-lg text-headline-lg text-white">Ringkasan utang</h2>
       </div>
+      <span class="pill <?= $transfers ? 'bg-amber-400/20 text-amber-200' : 'bg-lime-400/20 text-lime-200' ?>"><?= $transfers ? count($transfers) . ' transfer' : 'Lunas' ?></span>
     </div>
-  </section>
-
-  <section class="card">
-    <div class="card-header">
-      <h2><?= icon('chart') ?> Ringkasan Utang</h2>
-      <span class="badge <?= $transfers ? 'badge-warning' : 'badge-success' ?>">
-        <?= $transfers ? count($transfers) . ' transfer' : 'Lunas' ?>
-      </span>
-    </div>
-    <div class="card-body">
+    <div class="flex flex-col gap-space-sm">
       <?php if (!$transfers): ?>
-        <div class="empty-state">
-          <?= icon('check') ?>
-          <strong>Semasa lunas</strong>
-          <span>Tidak ada utang aktif di grup ini.</span>
+        <div class="rounded-2xl bg-white/10 p-space-md">
+          <p class="font-headline-md text-headline-md text-white">Semasa lunas</p>
+          <p class="font-label-md text-label-md text-[#99f6e4]">Tidak ada utang aktif di grup ini.</p>
         </div>
       <?php else: ?>
-        <div class="member-list">
-          <?php foreach ($transfers as $transfer): ?>
-            <?php
+        <?php foreach ($transfers as $transfer): ?>
+          <?php
             $fromId = (int) $transfer['from'];
             $toId = (int) $transfer['to'];
             $amount = (int) $transfer['amount'];
             $canSettle = $isAdmin || $fromId === $userId || $toId === $userId;
-            ?>
-            <div class="member-row">
-              <span class="avatar" aria-hidden="true"><?= e(mb_substr($userNames[$fromId] ?? '?', 0, 1)) ?></span>
-              <div class="member-meta">
-                <span class="member-name">
-                  <?= e($userNames[$fromId] ?? ('Anggota #' . $fromId)) ?>
-                  bayar <strong><?= e(format_rupiah($amount)) ?></strong>
-                  ke <?= e($userNames[$toId] ?? ('Anggota #' . $toId)) ?>
-                </span>
-                <span class="cell-sub">Transfer disederhanakan otomatis.</span>
-              </div>
-              <?php if ($canSettle): ?>
-                <div class="member-actions">
-                  <form method="post" action="<?= e(url('process/split_process.php')) ?>">
-                    <input type="hidden" name="action" value="settle">
-                    <input type="hidden" name="group_id" value="<?= $groupId ?>">
-                    <input type="hidden" name="from_user_id" value="<?= $fromId ?>">
-                    <input type="hidden" name="to_user_id" value="<?= $toId ?>">
-                    <input type="hidden" name="amount" value="<?= $amount ?>">
-                    <?= csrf_field() ?>
-                    <button class="btn btn-sm btn-accent" type="submit"><?= icon('check') ?> Tandai Lunas</button>
-                  </form>
-                </div>
-              <?php endif; ?>
-            </div>
-          <?php endforeach; ?>
-        </div>
+          ?>
+          <div class="rounded-2xl bg-white/10 p-space-md">
+            <p class="font-body-md text-body-md text-white">
+              <?= e($userNames[$fromId] ?? ('Anggota #' . $fromId)) ?> bayar
+              <strong class="tabular-nums text-secondary-fixed"><?= e(format_rupiah($amount)) ?></strong>
+              ke <?= e($userNames[$toId] ?? ('Anggota #' . $toId)) ?>
+            </p>
+            <?php if ($canSettle): ?>
+              <form class="mt-space-sm" method="post" action="<?= e(url('process/split_process.php')) ?>">
+                <input type="hidden" name="action" value="settle">
+                <input type="hidden" name="group_id" value="<?= $groupId ?>">
+                <input type="hidden" name="from_user_id" value="<?= $fromId ?>">
+                <input type="hidden" name="to_user_id" value="<?= $toId ?>">
+                <input type="hidden" name="amount" value="<?= $amount ?>">
+                <?= csrf_field() ?>
+                <button class="inline-flex h-9 items-center rounded-full bg-secondary-fixed px-space-md font-label-md text-label-md font-bold text-on-secondary-fixed hover:bg-secondary-fixed-dim" type="submit">Tandai lunas</button>
+              </form>
+            <?php endif; ?>
+          </div>
+        <?php endforeach; ?>
       <?php endif; ?>
     </div>
-  </section>
-</div>
+  </div>
+</section>
 
-<section class="card">
-  <div class="card-header">
-    <h2><?= icon('list') ?> Pengeluaran grup</h2>
-    <button class="btn btn-primary" type="button" data-modal-open="add-expense-modal">
-      <?= icon('plus') ?> Catat pengeluaran
+<section class="bento-card mt-space-lg">
+  <div class="flex flex-wrap items-center justify-between gap-space-sm">
+    <div>
+      <h2 class="font-headline-lg text-headline-lg text-on-surface">Pengeluaran grup</h2>
+      <p class="mt-1 font-body-md text-body-md text-on-surface-variant">Daftar tagihan dan rincian pembagian.</p>
+    </div>
+    <button class="inline-flex h-11 items-center gap-2 rounded-xl bg-primary-container px-5 font-label-lg text-label-lg text-on-primary hover:bg-primary" type="button" data-modal-open="add-expense-modal">
+      <span class="material-symbols-outlined text-[18px]" aria-hidden="true">add</span> Catat pengeluaran
     </button>
   </div>
-  <div class="card-body">
+  <div class="mt-space-lg">
     <?php if (!$expenses): ?>
-      <div class="empty-state">
-        <?= icon('wallet') ?>
-        <strong>Belum ada pengeluaran</strong>
-        <span>Catat tagihan pertama agar utang dihitung otomatis.</span>
+      <div class="flex flex-col items-center justify-center gap-2 rounded-2xl bg-surface-container-low px-4 py-12 text-center">
+        <span class="material-symbols-outlined text-[28px] text-outline-variant" aria-hidden="true">receipt_long</span>
+        <p class="font-headline-md text-headline-md text-on-surface">Belum ada pengeluaran</p>
+        <p class="max-w-sm font-body-md text-body-md text-on-surface-variant">Catat tagihan pertama agar utang dihitung otomatis.</p>
       </div>
     <?php else: ?>
-      <div class="grid">
+      <div class="grid grid-cols-1 gap-space-md xl:grid-cols-2">
         <?php foreach ($expenses as $expense): ?>
           <?php
           $expenseId = (int) $expense['id'];
           $canManage = $isAdmin || $expense['payer_id'] === $userId;
           ?>
-          <div class="card">
-            <div class="card-header">
+          <div class="rounded-2xl border border-surface-container bg-surface-container-lowest p-space-md">
+            <div class="flex flex-wrap items-start justify-between gap-space-sm">
               <div>
-                <span class="cell-main"><?= e($expense['title']) ?></span>
-                <span class="cell-sub">
-                  <?= e($expense['date']) ?> · dibayar <?= e($expense['payer_name']) ?>
-                </span>
+                <h3 class="font-headline-md text-headline-md text-on-surface"><?= e($expense['title']) ?></h3>
+                <p class="font-label-sm text-label-sm text-on-surface-variant"><?= e($expense['date']) ?> · dibayar <?= e($expense['payer_name']) ?></p>
               </div>
-              <div class="page-actions">
-                <span class="badge <?= $expense['has_outstanding'] ? 'badge-warning' : 'badge-success' ?>">
-                  <?= $expense['has_outstanding'] ? 'Belum lunas' : 'Lunas' ?>
-                </span>
-                <strong><?= e(format_rupiah($expense['total'])) ?></strong>
+              <div class="flex items-center gap-space-xs">
+                <span class="pill <?= $expense['has_outstanding'] ? 'pill-warning' : 'pill-lime' ?>"><?= $expense['has_outstanding'] ? 'Belum lunas' : 'Lunas' ?></span>
+                <strong class="tabular-nums text-on-surface"><?= e(format_rupiah($expense['total'])) ?></strong>
                 <?php if ($canManage): ?>
                   <form method="post" action="<?= e(url('process/split_process.php')) ?>" data-confirm="Hapus pengeluaran <?= e($expense['title']) ?>?">
                     <input type="hidden" name="action" value="delete_expense">
                     <input type="hidden" name="group_id" value="<?= $groupId ?>">
                     <input type="hidden" name="expense_id" value="<?= $expenseId ?>">
                     <?= csrf_field() ?>
-                    <button class="btn btn-sm btn-danger" type="submit"><?= icon('trash') ?></button>
+                    <button class="grid h-8 w-8 place-items-center rounded-full bg-red-50 text-red-600 hover:bg-red-100" type="submit" aria-label="Hapus pengeluaran"><span class="material-symbols-outlined text-[16px]" aria-hidden="true">delete</span></button>
                   </form>
                 <?php endif; ?>
               </div>
             </div>
-            <div class="card-body">
-              <div class="member-list">
-                <?php foreach ($expense['splits'] as $split): ?>
-                  <div class="split-row">
-                    <span class="split-person">
-                      <span class="avatar" aria-hidden="true"><?= e(mb_substr($userNames[$split['user_id']] ?? '?', 0, 1)) ?></span>
-                      <strong><?= e($userNames[$split['user_id']] ?? ('Anggota #' . $split['user_id'])) ?></strong>
-                    </span>
-                    <div class="field-hint">
-                      <?= $split['user_id'] === $expense['payer_id'] ? 'Bagian pembayar' : ($split['settled'] ? 'Lunas' : 'Belum lunas') ?>
-                    </div>
-                    <span class="split-amount"><?= e(format_rupiah($split['amount'])) ?></span>
-                  </div>
-                <?php endforeach; ?>
-              </div>
-
-              <?php if ($canManage): ?>
-                <details style="margin-top: var(--space-4);">
-                  <summary class="btn btn-sm"><?= icon('edit') ?> Edit pengeluaran</summary>
-                  <div style="margin-top: var(--space-4);">
-                    <?php
-                    gd_render_split_form(
-                        $groupId,
-                        $isAdmin,
-                        $members,
-                        $userNames,
-                        'update_expense',
-                        'Simpan perubahan',
-                        (string) $expense['title'],
-                        (string) $expense['total'],
-                        (string) $expense['date'],
-                        (int) $expense['payer_id'],
-                        $expense['participants'],
-                        $expense['amounts'],
-                        (string) $expense['mode'],
-                        $expenseId
-                    );
-                    ?>
-                  </div>
-                </details>
-              <?php endif; ?>
+            <div class="mt-space-md flex flex-col gap-space-xs">
+              <?php foreach ($expense['splits'] as $split): ?>
+                <div class="split-row">
+                  <span class="split-person">
+                    <span class="avatar" aria-hidden="true"><?= e(mb_substr($userNames[$split['user_id']] ?? '?', 0, 1)) ?></span>
+                    <strong><?= e($userNames[$split['user_id']] ?? ('Anggota #' . $split['user_id'])) ?></strong>
+                  </span>
+                  <span class="font-label-sm text-label-sm text-on-surface-variant"><?= $split['user_id'] === $expense['payer_id'] ? 'Bagian pembayar' : ($split['settled'] ? 'Lunas' : 'Belum lunas') ?></span>
+                  <span class="split-amount"><?= e(format_rupiah($split['amount'])) ?></span>
+                </div>
+              <?php endforeach; ?>
             </div>
+
+            <?php if ($canManage): ?>
+              <details class="mt-space-md border-t border-surface-container pt-space-md">
+                <summary class="cursor-pointer font-label-md text-label-md font-bold text-primary">Edit pengeluaran</summary>
+                <div class="mt-space-md">
+                  <?php
+                  gd_render_split_form(
+                      $groupId,
+                      $isAdmin,
+                      $members,
+                      $userNames,
+                      'update_expense',
+                      'Simpan perubahan',
+                      (string) $expense['title'],
+                      (string) $expense['total'],
+                      (string) $expense['date'],
+                      (int) $expense['payer_id'],
+                      $expense['participants'],
+                      $expense['amounts'],
+                      (string) $expense['mode'],
+                      $expenseId
+                  );
+                  ?>
+                </div>
+              </details>
+            <?php endif; ?>
           </div>
         <?php endforeach; ?>
       </div>
@@ -514,12 +483,12 @@ render_header('Detail Patungan', 'groups');
 
 <div class="modal" id="add-expense-modal" aria-hidden="true">
   <div class="modal-backdrop" data-modal-close></div>
-  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="add-expense-title">
-    <div class="modal-head">
-      <h2 id="add-expense-title"><?= icon('plus') ?> Catat pengeluaran</h2>
-      <button class="icon-button" type="button" data-modal-close aria-label="Tutup"><?= icon('close') ?></button>
+  <div class="modal-panel max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="add-expense-title">
+    <div class="flex items-center justify-between gap-space-sm border-b border-surface-container p-6">
+      <h2 class="font-headline-md text-headline-md" id="add-expense-title">Catat pengeluaran</h2>
+      <button class="grid h-9 w-9 place-items-center rounded-full bg-surface-container-low text-on-surface-variant" type="button" data-modal-close aria-label="Tutup"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">close</span></button>
     </div>
-    <div class="modal-body">
+    <div class="max-h-[70vh] overflow-y-auto p-6">
       <?php
       gd_render_split_form(
           $groupId,

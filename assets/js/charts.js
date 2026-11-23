@@ -17,8 +17,7 @@
   let selectedMonth = initialMonth;
 
   const palettes = {
-    light: ['#1e40af', '#047857', '#b45309', '#dc2626', '#7c3aed', '#0891b2'],
-    dark: ['#60a5fa', '#34d399', '#fbbf24', '#f87171', '#a78bfa', '#22d3ee'],
+    light: ['#134e4a', '#a3e635', '#003633', '#ef4444', '#316763', '#98da27'],
   };
 
   function rupiah(value) {
@@ -27,7 +26,7 @@
   }
 
   function themeName() {
-    return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+    return 'light';
   }
 
   function cssVar(name, fallback) {
@@ -37,16 +36,15 @@
 
   function palette() {
     const theme = themeName();
-    const light = theme === 'light';
     return {
       theme,
-      text: cssVar('--color-foreground', light ? '#0f172a' : '#f8fafc'),
-      muted: cssVar('--color-muted-foreground', light ? '#5b6b82' : '#a7b4c8'),
-      grid: cssVar('--color-border', light ? 'rgba(15, 23, 42, 0.1)' : 'rgba(255, 255, 255, 0.1)'),
-      surface: cssVar('--color-surface-solid', light ? '#ffffff' : '#192134'),
-      primary: cssVar('--color-primary', light ? '#1e40af' : '#60a5fa'),
-      accent: cssVar('--color-accent', light ? '#047857' : '#34d399'),
-      danger: cssVar('--color-danger', light ? '#dc2626' : '#f87171'),
+      text: cssVar('--color-foreground', '#141b2b'),
+      muted: cssVar('--color-muted-foreground', '#6b7280'),
+      grid: cssVar('--color-border', 'rgba(17, 24, 39, 0.06)'),
+      surface: cssVar('--color-surface-solid', '#ffffff'),
+      primary: cssVar('--color-primary', '#134e4a'),
+      accent: cssVar('--color-accent', '#a3e635'),
+      danger: cssVar('--color-danger', '#ef4444'),
       doughnut: palettes[theme],
     };
   }
@@ -59,7 +57,7 @@
       let notice = box.querySelector('[data-chart-message]');
       if (!notice) {
         notice = document.createElement('div');
-        notice.className = 'empty-state';
+        notice.className = 'flex items-center justify-center rounded-2xl bg-surface-container-low px-4 py-6 text-center font-label-md text-label-md text-on-surface-variant';
         notice.dataset.chartMessage = 'true';
         box.appendChild(notice);
       }
@@ -152,7 +150,7 @@
               usePointStyle: true,
               boxWidth: 8,
               padding: 14,
-              font: { family: "'Quicksand', 'Segoe UI', sans-serif", size: 11 },
+              font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 },
             },
           },
           tooltip: {
@@ -242,7 +240,7 @@
               usePointStyle: true,
               boxWidth: 8,
               padding: 14,
-              font: { family: "'Quicksand', 'Segoe UI', sans-serif", size: 11 },
+              font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 },
             },
           },
           tooltip: {
@@ -270,7 +268,7 @@
     if (!payload) return;
 
     const colors = palette();
-    Chart.defaults.font.family = "'Quicksand', 'Segoe UI', sans-serif";
+    Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
     Chart.defaults.color = colors.muted;
 
     destroyCharts();
@@ -322,10 +320,6 @@
       showMessage(error && error.message ? error.message : 'Gagal memuat grafik.');
     }
   }
-
-  window.addEventListener('sakuku:themechange', () => {
-    if (payload) renderAll();
-  });
 
   if (typeof reducedMotion.addEventListener === 'function') {
     reducedMotion.addEventListener('change', () => {
