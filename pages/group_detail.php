@@ -104,13 +104,12 @@ function gd_render_split_form(
             <?php $memberId = (int) $member['id']; ?>
             <label class="split-row cursor-pointer">
               <input class="h-4 w-4 accent-primary" type="checkbox" name="participants[]" value="<?= $memberId ?>"
-                     data-participant data-name="<?= e($member['name']) ?>"
+                     data-participant data-name="<?= e($member['name']) ?>" aria-label="<?= e($member['name']) ?>"
                      <?= isset($selectedSet[$memberId]) ? 'checked' : '' ?>>
-              <span class="split-person">
-                <span class="avatar" aria-hidden="true"><?= e(mb_substr((string) $member['name'], 0, 1)) ?></span>
-                <strong><?= e($member['name']) ?></strong>
-              </span>
               <span class="field-hint"><?= $memberId === $payerId ? 'Pembayar' : '' ?></span>
+              <span class="split-person" title="<?= e($member['name']) ?>">
+                <span class="avatar" aria-hidden="true"><?= e(mb_substr((string) $member['name'], 0, 1)) ?></span>
+              </span>
             </label>
           <?php endforeach; ?>
         </div>
