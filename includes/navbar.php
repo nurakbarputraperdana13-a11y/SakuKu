@@ -36,6 +36,7 @@ function render_header(string $title, string $active = '', bool $withCharts = fa
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="SakuKu - manajemen keuangan mahasiswa">
   <title><?= e($title) ?> - SakuKu</title>
+  <link rel="icon" type="image/png" href="<?= e(url('assets/img/favicon.png')) ?>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -53,7 +54,7 @@ function render_header(string $title, string $active = '', bool $withCharts = fa
     <div class="mx-auto flex h-20 w-full max-w-[1440px] items-center justify-between gap-space-md px-margin md:px-margin-desktop">
       <div class="flex min-w-0 items-center gap-space-sm">
         <a href="<?= e(url('pages/dashboard.php')) ?>" class="flex shrink-0 items-center gap-space-sm rounded-full bg-surface-container-lowest py-space-xs pl-space-xs pr-space-md shadow-sm">
-          <span class="grid h-9 w-9 place-items-center rounded-full bg-primary-container text-[18px] font-bold text-on-primary">S</span>
+          <img class="h-9 w-9 object-contain" src="<?= e(url('assets/img/sakuku-logo.png')) ?>" alt="Logo SakuKu">
           <span class="flex flex-col text-left leading-none">
             <span class="font-label-sm text-label-sm text-on-surface-variant">Selamat datang kembali</span>
             <span class="font-label-lg text-label-lg font-bold text-on-surface">Halo, <?= e((string) ($user['name'] ?? 'Pengguna')) ?></span>

@@ -166,6 +166,7 @@ if (is_post()) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Pulihkan kata sandi SakuKu">
   <title>Lupa Kata Sandi - SakuKu</title>
+  <link rel="icon" type="image/png" href="<?= e(url('assets/img/favicon.png')) ?>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -179,7 +180,7 @@ if (is_post()) {
   <main class="mx-auto flex min-h-screen w-full max-w-[1440px] items-center px-margin py-space-xl md:px-margin-desktop">
     <div class="mx-auto w-full max-w-2xl rounded-3xl border border-surface-container bg-surface-container-lowest p-space-lg shadow-[0_24px_64px_-24px_rgba(17,24,39,0.25)] md:p-space-xl">
       <div class="flex items-center gap-space-sm">
-        <span class="grid h-11 w-11 place-items-center rounded-full bg-primary-container font-bold text-on-primary">S</span>
+        <img class="h-11 w-11 object-contain" src="<?= e(url('assets/img/sakuku-logo.png')) ?>" alt="Logo SakuKu">
         <span class="font-headline-md text-headline-md">SakuKu</span>
       </div>
 

@@ -25,6 +25,7 @@ $messages = pull_flash();
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Daftar akun SakuKu">
   <title>Daftar - SakuKu</title>
+  <link rel="icon" type="image/png" href="<?= e(url('assets/img/favicon.png')) ?>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -40,7 +41,7 @@ $messages = pull_flash();
       <aside class="bento-dark flex flex-col justify-between p-space-xl lg:col-span-4">
         <div>
           <div class="flex items-center gap-space-sm">
-            <span class="grid h-11 w-11 place-items-center rounded-full bg-secondary-fixed text-[20px] font-bold text-on-secondary-fixed">S</span>
+            <img class="h-11 w-11 object-contain" src="<?= e(url('assets/img/sakuku-logo.png')) ?>" alt="Logo SakuKu">
             <span class="font-headline-md text-headline-md">SakuKu</span>
           </div>
           <h2 class="mt-space-xl font-headline-xl text-headline-xl">Mulai dari satu catatan.</h2>

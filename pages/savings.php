@@ -154,8 +154,11 @@ render_header('Tabungan', 'savings');
             <?= csrf_field() ?>
             <input type="hidden" name="action" value="topup">
             <input type="hidden" name="id" value="<?= $goalId ?>">
-            <label class="sr-only" for="topup-<?= $goalId ?>">Nominal setor</label>
-            <input id="topup-<?= $goalId ?>" name="amount" type="text" inputmode="numeric" placeholder="Setor Rp..." required>
+            <div class="field">
+              <label for="topup-<?= $goalId ?>">Nominal setor</label>
+              <input id="topup-<?= $goalId ?>" name="amount" type="text" inputmode="numeric" placeholder="Contoh: 50000" aria-describedby="topup-hint-<?= $goalId ?>" required>
+              <span class="field-hint" id="topup-hint-<?= $goalId ?>">Isi angka di kolom ini, lalu tekan tombol Setor dana. Boleh ditulis Rp50.000.</span>
+            </div>
             <button class="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl bg-secondary-fixed font-label-lg text-label-lg font-bold text-on-secondary-fixed transition-colors hover:bg-secondary-fixed-dim" type="submit">
               <span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_downward</span> Setor dana
             </button>
@@ -164,8 +167,11 @@ render_header('Tabungan', 'savings');
             <?= csrf_field() ?>
             <input type="hidden" name="action" value="withdraw">
             <input type="hidden" name="id" value="<?= $goalId ?>">
-            <label class="sr-only" for="withdraw-<?= $goalId ?>">Nominal tarik</label>
-            <input id="withdraw-<?= $goalId ?>" name="amount" type="text" inputmode="numeric" placeholder="Tarik Rp..." required>
+            <div class="field">
+              <label for="withdraw-<?= $goalId ?>">Nominal tarik</label>
+              <input id="withdraw-<?= $goalId ?>" name="amount" type="text" inputmode="numeric" placeholder="Contoh: 50000" aria-describedby="withdraw-hint-<?= $goalId ?>" required>
+              <span class="field-hint" id="withdraw-hint-<?= $goalId ?>">Isi angka di kolom ini, lalu tekan tombol Tarik dana. Boleh ditulis Rp50.000.</span>
+            </div>
             <button class="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl border border-on-surface/10 font-label-lg text-label-lg text-on-surface transition-colors hover:bg-surface-container-low" type="submit">
               <span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_upward</span> Tarik dana
             </button>
